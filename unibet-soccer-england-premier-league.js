@@ -8,18 +8,34 @@ const path = require('path');
     headless: true
   })
 
+  const page = await browser.newPage()
+
   try {
-    const page = await browser.newPage()
     await page.setViewport({ width: 1366, height: 768 })
-
     const url = 'https://www.unibet.com/betting/sports/filter/football/england/premier_league/matches'
-
+    
     await page.goto(url, {
       waitUntil: ['networkidle0', 'load']
     }) 
 
-    await page.waitForSelector('.c5d50', {
+    const noMatchMsgFound = await page.evaluate(() => {
+      const string = 'not available at the moment'
+      return document
+        .querySelector('body')
+        .innerText
+        .includes(string)
+    })
+
+    if (noMatchMsgFound) {
+      console.log('no matches available')
+      return [];
+    }
+
+    const selector = '.c5d50'
+    const selectorTimeout = 5000
+    await page.waitForSelector(selector, {
       visible: true,
+      timeout: selectorTimeout,
     });
 
     const step = 250
