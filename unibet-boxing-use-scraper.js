@@ -3,7 +3,6 @@ const moment = require('moment')
 const Scraper = require('./scraper')
 
 const domHandler = $ => {
-  let matches = []
   const matchDivs = $('li.KambiBC-event-item')
 
   return matchDivs.map((idx, el) => {
@@ -24,16 +23,16 @@ const domHandler = $ => {
     const matchTimestamp = new Date(dateTime).toISOString()
     
     const [ boxer1Name, boxer2Name ] = $el
-    .first()
-    .find(".KambiBC-event-participants__name")
-    .map((idx, el) => $(el).text())
-    .toArray()
+      .first()
+      .find(".KambiBC-event-participants__name")
+      .map((idx, el) => $(el).text().trim())
+      .toArray()
     
     const [ oddsBoxer1, oddsDraw, oddsBoxer2 ] = $el
-    .first()
-    .find(".KambiBC-mod-outcome__odds-wrapper")
-    .map((idx, oddsEl) => $(oddsEl).text())
-    .toArray()
+      .first()
+      .find(".KambiBC-mod-outcome__odds-wrapper")
+      .map((idx, oddsEl) => $(oddsEl).text().trim())
+      .toArray()
     
     return {
       matchTimestamp,
