@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const scrollPageToBottom = require("puppeteer-autoscroll-down");
 const cheerio = require("cheerio");
 
-const scrape = async function(config) {
+module.exports.scrape = async function(config) {
   const startTime = new Date();
 
   // do some validation on config/options object
@@ -53,9 +53,10 @@ const scrape = async function(config) {
     const $ = cheerio.load(content);
 
     // yield to extractor script to populate data
-    const data = config.domHandler($, {
+    const scrapeContext = {
       pageUrl: page.url()
-    });
+    };
+    const data = config.pageFunction($, scrapeContext);
 
     const endTime = new Date();
     const elapsedMS = endTime - startTime;
@@ -64,6 +65,8 @@ const scrape = async function(config) {
     const numResults = data.length;
 
     const scrapeResult = {
+      sourceName: config.sourceName,
+      sportName: config.sportName,
       url: config.url,
       startTimestamp,
       endTimestamp,
@@ -72,7 +75,6 @@ const scrape = async function(config) {
       data
     };
 
-    console.log(scrapeResult);
     return scrapeResult;
   } catch (err) {
     console.error(err);
@@ -80,8 +82,4 @@ const scrape = async function(config) {
   } finally {
     browser.close();
   }
-};
-
-module.exports = {
-  scrape: scrape
 };
