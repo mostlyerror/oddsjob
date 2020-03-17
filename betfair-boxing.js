@@ -1,5 +1,3 @@
-const cheerio = require("cheerio");
-const moment = require("moment");
 const Scraper = require("./scraper");
 const { normalizeDateYear } = require("./utils");
 

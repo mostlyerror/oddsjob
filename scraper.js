@@ -23,18 +23,20 @@ const scrape = async function(config) {
     }) 
     
     // check for no matches / events before scrolling
-    const noMatchMsgFound = await page.evaluate((config) => {
-      return document
-        .querySelector('body')
-        .innerText
-        .toLowerCase()
-        .includes(config.noMatchText.toLowerCase())
-    }, config)
-
-    if (noMatchMsgFound) {
-      console.log('no matches available')
-      return [];
-    }
+    if (config.noMatchText != undefined) {
+      const noMatchMsgFound = await page.evaluate((config) => {
+        return document
+          .querySelector('body')
+          .innerText
+          .toLowerCase()
+          .includes(config.noMatchText.toLowerCase())
+      }, config)
+  
+      if (noMatchMsgFound) {
+        console.log('no matches available')
+        return [];
+      }
+    }      
 
     // do the scroll
     const step = 250
