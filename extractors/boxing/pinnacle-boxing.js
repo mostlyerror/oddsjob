@@ -1,8 +1,7 @@
-const Scraper = require("./scraper");
-const { normalizeDateYear } = require("./utils");
+const { normalizeDateYear } = require("../utils");
 const url = require('url')
 
-const domHandler = ($, context) => {
+const pageFunction = ($, context) => {
   const matchDivs = $('[data-test-id="Event.Row"]');
 
   return matchDivs
@@ -69,10 +68,12 @@ const domHandler = ($, context) => {
     .toArray();
 };
 
-Scraper.scrape({
+module.exports = {
+  sourceName: 'pinnacle',
+  sportName: 'boxing',
   url: "https://www.pinnacle.com/en/boxing/matchups/",
   noMatchText: "There are no events to show",
   waitElementSelector: '[data-test-id="Event.Row"]',
   waitElementTimeoutMS: 6000,
-  domHandler: domHandler
-});
+  pageFunction,
+};

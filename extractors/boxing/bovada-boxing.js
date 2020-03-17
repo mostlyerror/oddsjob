@@ -1,8 +1,7 @@
-const Scraper = require("./scraper");
-const { normalizeDateYear } = require("./utils");
+const { normalizeDateYear } = require("../utils");
 const url = require('url')
 
-const domHandler = ($, context) => {
+const pageFunction = ($, context) => {
   const matchDivs = $("section.coupon-content.more-info");
 
   return matchDivs
@@ -59,10 +58,12 @@ const domHandler = ($, context) => {
     .toArray();
 };
 
-Scraper.scrape({
+module.exports = {
+  sourceName: 'bovada',
+  sportName: 'boxing',
   url: "https://www.bovada.lv/sports/boxing",
   // noMatchText: "not available at the moment", // have not seen this yet
   waitElementSelector: ".grouped-events",
   waitElementTimeoutMS: 6000,
-  domHandler: domHandler
-});
+  pageFunction,
+}

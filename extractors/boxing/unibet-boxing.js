@@ -1,27 +1,32 @@
-const Scraper = require("./scraper");
-const { normalizeDateYear } = require("./utils");
-const url = require('url')
-const path = require('path')
+const { normalizeDateYear } = require("../utils");
+const url = require("url");
+const path = require("path");
 
-const domHandler = ($, context) => {
+const pageFunction = ($, context) => {
   const matchDivs = $("li.KambiBC-event-item");
 
   return matchDivs
     .map((idx, el) => {
       let $el = $(el);
 
-      const pageUrl = url.parse(context.pageUrl)
-      let re = /event-item-(\d+)/
-      const eventId = $el.attr('class').match(re)[1]
-      const detailPath = path.join(pageUrl.pathname, eventId)
+      const pageUrl = url.parse(context.pageUrl);
+      let re = /event-item-(\d+)/;
+      const eventId = $el.attr("class").match(re)[1];
+      const detailPath = path.join(pageUrl.pathname, eventId);
       const detailUrl = url.format({
         protocol: pageUrl.protocol,
         hostname: pageUrl.host,
         pathname: detailPath
-      })
+      });
 
-      const date = $el.find(".KambiBC-event-item__start-time--date").text().trim();
-      const time = $el.find(".KambiBC-event-item__start-time--time").text().trim();
+      const date = $el
+        .find(".KambiBC-event-item__start-time--date")
+        .text()
+        .trim();
+      const time = $el
+        .find(".KambiBC-event-item__start-time--time")
+        .text()
+        .trim();
       const dateTime = `${date} ${time}`;
 
       // this doesn't have a time zone attached.
@@ -52,10 +57,12 @@ const domHandler = ($, context) => {
     .toArray();
 };
 
-Scraper.scrape({
+module.exports = {
+  sourceName: 'unibet',
+  sportName: 'boxing',
   url: "https://www.unibet.com/betting/sports/filter/boxing",
   noMatchText: "not available at the moment",
   waitElementSelector: "li.KambiBC-event-item",
   waitElementTimeoutMS: 6000,
-  domHandler: domHandler
-});
+  pageFunction,
+};
