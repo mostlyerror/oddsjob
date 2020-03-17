@@ -1,12 +1,23 @@
 const Scraper = require("./scraper");
 const { normalizeDateYear } = require("./utils");
+const url = require('url')
 
-const domHandler = $ => {
+const domHandler = ($, context) => {
   const matchDivs = $("section.coupon-content.more-info");
 
   return matchDivs
     .map((idx, el) => {
       let $el = $(el);
+
+      const pageUrl = url.parse(context.pageUrl)
+      const path = $el
+        .find("a.game-view-cta")
+        .attr("href")
+      const detailUrl = url.format({
+        protocol: pageUrl.protocol,
+        hostname: pageUrl.host,
+        pathname: path
+      })
 
       const date = $el
         .find("sp-score-coupon.scores span.period")
@@ -36,6 +47,7 @@ const domHandler = $ => {
         .toArray();
 
       return {
+        detailUrl,
         matchTimestamp,
         boxer1Name,
         boxer2Name,

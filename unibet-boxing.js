@@ -1,14 +1,24 @@
-const cheerio = require("cheerio");
-const moment = require("moment");
 const Scraper = require("./scraper");
 const { normalizeDateYear } = require("./utils");
+const url = require('url')
+const path = require('path')
 
-const domHandler = $ => {
+const domHandler = ($, context) => {
   const matchDivs = $("li.KambiBC-event-item");
 
   return matchDivs
     .map((idx, el) => {
       let $el = $(el);
+
+      const pageUrl = url.parse(context.pageUrl)
+      let re = /event-item-(\d+)/
+      const eventId = $el.attr('class').match(re)[1]
+      const detailPath = path.join(pageUrl.pathname, eventId)
+      const detailUrl = url.format({
+        protocol: pageUrl.protocol,
+        hostname: pageUrl.host,
+        pathname: detailPath
+      })
 
       const date = $el.find(".KambiBC-event-item__start-time--date").text().trim();
       const time = $el.find(".KambiBC-event-item__start-time--time").text().trim();
@@ -30,6 +40,7 @@ const domHandler = $ => {
         .toArray();
 
       return {
+        detailUrl,
         matchTimestamp,
         boxer1Name,
         boxer2Name,

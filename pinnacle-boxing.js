@@ -1,21 +1,32 @@
-const cheerio = require("cheerio");
-const moment = require("moment");
 const Scraper = require("./scraper");
 const { normalizeDateYear } = require("./utils");
+const url = require('url')
 
-const domHandler = $ => {
+const domHandler = ($, context) => {
   const matchDivs = $('[data-test-id="Event.Row"]');
 
   return matchDivs
     .map((idx, el) => {
-      const date = $(el)
+      let $el = $(el)
+
+      const pageUrl = url.parse(context.pageUrl)
+      const path = $el
+        .find('a.eventGameInfo')
+        .attr('href')
+      const detailUrl = url.format({
+        protocol: pageUrl.protocol,
+        hostname: pageUrl.host,
+        pathname: path
+      })
+
+      const date = $el
         .prev()
         .prevAll("[class^=style_dateBar]")
         .first()
         .text()
         .trim();
 
-      const time = $(el)
+      const time = $el
         .find("[class^=style_time]")
         .text()
         .trim();
@@ -26,12 +37,12 @@ const domHandler = $ => {
       // for now, the browser seems to default to local TZ (MDT)
       const matchTimestamp = normalizeDateYear(dateTime);
 
-      const [boxer1Name, boxer2Name] = $(el)
+      const [boxer1Name, boxer2Name] = $el
         .find("[class^=style_participantName]")
         .map((idx, el) => $(el).text().trim())
         .toArray();
 
-      const [oddsBoxer1, oddsBoxer2] = $(el)
+      const [oddsBoxer1, oddsBoxer2] = $el
         .first()
         .find("span.price")
         .map((idx, el) => $(el).text().trim())
@@ -46,6 +57,7 @@ const domHandler = $ => {
       // a draw, wagers on either fighter will be refunded.
 
       return {
+        detailUrl,
         matchTimestamp,
         boxer1Name,
         boxer2Name,

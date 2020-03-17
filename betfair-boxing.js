@@ -1,12 +1,23 @@
 const Scraper = require("./scraper");
 const { normalizeDateYear } = require("./utils");
+const url = require('url')
 
-const domHandler = $ => {
+const domHandler = ($, context) => {
   const matchDivs = $("li > div.event-information.ui-event");
 
   return matchDivs
     .map((idx, el) => {
       let $el = $(el);
+
+      const pageUrl = url.parse(context.pageUrl)
+      const path = $el
+        .find("a.event-link")
+        .attr("href")
+      const detailUrl = url.format({
+        protocol: pageUrl.protocol,
+        hostname: pageUrl.host,
+        pathname: path
+      })
 
       const dateTime = $el
         .find("span.date.ui-countdown")
@@ -30,6 +41,7 @@ const domHandler = $ => {
         .toArray();
 
       return {
+        detailUrl,
         matchTimestamp,
         boxer1Name,
         boxer2Name,
